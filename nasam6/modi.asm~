@@ -1,0 +1,217 @@
+section .text
+	global main
+		extern scanf
+		extern printf
+	
+main: 
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, inpmsg1
+	mov edx, inpmsg1len
+	int 80h
+	
+	call read_num
+	;call print_num
+	
+	;mov eax, 4
+	;mov ebx, 1
+	;mov ecx, inpmsg2
+	;mov edx, inpmsg2len
+	;int 80h
+	
+	;call read
+	fstp qword[x]
+	
+	fld1
+	fld qword[x]
+	fsub ST1
+	
+	fdiv qword[x]
+	fstp qword[X]
+	
+	fstp qword[trash]
+	fstp qword[trash]
+	fstp qword[trash]
+	
+	
+	;mov eax, 4
+	;mov ebx, 1
+	;mov ecx, outmsg
+	;mov edx, outmsglen
+	;int 80h
+	
+	fldz
+	fstp qword[sumx]
+	fldz
+	fstp qword[mult]
+	mov word[count], 0
+	fld1
+	fstp qword[numerator]
+	fldz
+	fstp qword[denominator]
+	mov word[two], 2
+	
+	while:
+	
+		mov dx, 0
+		mov ax, word[count]
+		cmp ax, word[num]
+		je end_while
+			
+		add:
+			fld qword[X]
+			fld qword[numerator]
+			fmul ST1
+			fstp qword[numerator]
+			fstp qword[trash]
+			fstp qword[trash]
+			
+			fld1
+			fld qword[denominator]
+			fadd ST1
+			fstp qword[denominator]
+			fstp qword[trash]
+			
+			fld qword[denominator]
+			fld qword[numerator]
+			fdiv ST1
+			
+			fstp qword[fraction]
+			
+			fld qword[fraction]
+			fld qword[sumx]
+			fadd ST1
+			
+			fstp qword[sumx]
+			mov ax,word[count]
+			add ax, 1
+			mov word[count], ax
+			fstp qword[trash]
+			fstp qword[trash]
+			fstp qword[trash]
+			fstp qword[trash]	
+			jmp while
+	
+	end_while:
+		fld qword[sumx]
+		call print
+	
+
+	jmp exit
+
+exit:
+	mov eax, 1
+	mov ebx, 0
+	int 80h
+
+print:
+	push ebp
+	mov ebp, esp
+	sub esp, 8
+	fst qword[ebp-8]
+	push format2
+	call printf	
+	mov esp, ebp
+	pop ebp
+	ret
+			
+			
+read_num:
+  pusha
+  mov word[num], 0
+  loop_read:
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, temp
+    mov edx, 1
+    int 80h
+    cmp byte[temp], 10
+      je end_read
+    mov ax, word[num]
+    mov bx, 10
+    mul bx
+    mov bl, byte[temp]
+    sub bl, 30h
+    mov bh, 0
+    add ax, bx
+    mov word[num], ax
+    jmp loop_read 
+  end_read:
+  popa
+ret
+
+print_num:
+  extract_no:
+    cmp word[tempcount], 0
+    je print_no
+    inc byte[nod]
+    mov dx, 0
+    mov ax, word[tempcount]
+    mov bx, 10
+    div bx
+    push dx
+    mov word[tempcount], ax
+  jmp extract_no
+
+  print_no:
+    cmp byte[nod], 0
+    je end_print
+    dec byte[nod]
+    pop dx
+    mov byte[temp], dl
+    add byte[temp], 30h
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, temp
+    mov edx, 1
+    int 80h
+    
+    jmp print_no
+    
+ 	 end_print:
+  		mov eax, 4
+  		mov ebx, 1
+  		mov ecx, enter
+  		mov edx, 1
+  		int 80h
+  		ret     
+  popa
+ret 
+  
+
+read:
+	push ebp
+	mov ebp, esp
+	sub esp, 8
+	lea eax, [esp]
+	push eax
+	push format1
+	call scanf
+	fld qword[ebp-8]
+	mov esp, ebp
+	pop ebp
+ret
+
+section .data
+	format1: db "%lf",0
+	format2: db "%lf",10,0
+	inpmsg1: db "Enter the num",0Ah,0
+	inpmsg1len: equ $-inpmsg1
+	enter: db "",0Ah,0
+	
+section .bss
+	num: resw 1
+	temp: resb 1
+	x: resq 1
+	X: resq 1
+	sumx: resq 1
+	count: resw 1
+	denominator: resq 1
+	numerator: resq 1
+	fraction: resq 1
+	mult: resq 1
+	trash: resq 1
+	nod: resb 1
+	tempcount: resw 1
+	two: resd 1	

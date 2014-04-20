@@ -1,0 +1,303 @@
+section .data
+s: db "Enter no.of words (<= 10)",0Ah
+l: equ $-s
+s1: db "Enter word (Size < 10)",0Ah
+l1: equ $-s1
+s2: db "Words in lex. order",0Ah
+l2: equ $-s2
+
+section .bss
+n: resb 1
+a: resb 100
+b: resb 10
+i: resb 1
+j: resb 1
+t: resb 1
+
+section .text
+	global _start
+_start:
+
+mov eax,4
+mov ebx,1
+mov ecx,s
+mov edx,l
+int 80h
+
+mov eax,3
+mov ebx,0
+mov ecx,n
+mov edx,2
+int 80h
+
+sub byte[n],30h
+
+mov al,0
+mov byte[i],al
+
+readi:
+
+mov eax,4
+mov ebx,1
+mov ecx,s1
+mov edx,l1
+int 80h
+
+mov ebx,a
+mov al,byte[i]
+mov cl,10
+mul cl
+movzx edx,al
+add ebx,edx
+
+readj:
+
+push ebx
+
+mov eax,3
+mov ebx,0
+mov ecx,t
+mov edx,1
+int 80h
+
+pop ebx
+
+mov al,10
+cmp byte[t],al
+je next
+
+mov al,byte[t]
+mov byte[ebx],al
+add ebx,1
+jmp readj
+
+
+next:
+mov byte[ebx],0
+add byte[i],1
+mov al,byte[n]
+cmp al,byte[i]
+jg readi
+
+
+
+mov al,0
+mov byte[i],al
+
+sorti:
+mov al,0
+mov byte[j],0
+
+sortj:
+
+mov byte[t],-1
+
+repeat:
+
+inc byte[t]
+
+mov ebx,a
+mov al,byte[j]
+mov cl,10
+mul cl
+add al,byte[t]
+movzx edx,al
+add ebx,edx
+
+mov edx,a
+mov al,byte[j]
+inc al
+mov cl,10
+mul cl
+add al,byte[t]
+movzx ecx,al
+add edx,ecx
+
+mov al,byte[ebx]
+mov cl,0
+cmp al,cl
+je nextj
+
+mov al,byte[ebx]
+mov cl,byte[edx]
+cmp al,cl
+jg swap
+
+cmp al,cl
+je repeat
+
+jmp nextj
+
+swap:
+
+mov edx,a
+mov al,byte[j]
+mov cl,10
+mul cl
+movzx ecx,al
+add edx,ecx 
+
+mov ebx,b
+
+moveb:
+
+mov al,byte[edx]
+mov byte[ebx],al
+add ebx,1
+add edx,1
+
+mov cl,0
+cmp al,cl
+je qwe
+
+jmp moveb
+
+qwe:
+
+mov edx,a
+mov al,byte[j]
+inc al
+mov cl,10
+mul cl
+movzx ecx,al
+add edx,ecx 
+
+mov ebx,a
+mov al,byte[j]
+mov cl,10
+mul cl
+movzx ecx,al
+add ebx,ecx
+
+movea:
+
+mov al,byte[edx]
+mov byte[ebx],al
+add ebx,1
+add edx,1
+
+mov cl,0
+cmp al,cl
+je qwer
+
+jmp movea
+
+qwer:
+
+mov ebx,a
+mov al,byte[j]
+inc al
+mov cl,10
+mul cl
+movzx ecx,al
+add ebx,ecx 
+
+mov edx,b
+
+movec:
+
+mov al,byte[edx]
+mov byte[ebx],al
+add ebx,1
+add edx,1
+
+mov cl,0
+cmp al,cl
+je nextj
+
+jmp movec
+
+nextj:
+add byte[j],1
+mov al,byte[n]
+sub al,byte[i]
+dec al
+cmp al,byte[j]
+jg sortj
+
+add byte[i],1
+mov al,byte[n]
+dec al
+cmp al,byte[i]
+jg sorti
+
+mov al,0Ah
+mov byte[t],al
+
+mov eax,4
+mov ebx,1
+
+mov ecx,t
+mov edx,1
+int 80h
+
+mov eax,4
+mov ebx,1
+mov ecx,s2
+mov edx,l2
+int 80h
+
+
+
+
+mov al,0
+mov byte[i],al
+
+printi:
+
+mov ebx,a
+mov al,byte[i]
+mov cl,10
+mul cl
+movzx edx,al
+add ebx,edx
+
+printj:
+
+mov al,byte[ebx]
+mov byte[t],al
+
+mov al,0
+cmp byte[t],al
+je nextp
+
+push ebx
+
+mov eax,4
+mov ebx,1
+mov ecx,t
+mov edx,1
+int 80h
+
+pop ebx
+
+add ebx,1
+jmp printj
+
+
+nextp:
+
+mov al,0Ah
+mov byte[t],al
+
+push ebx
+
+mov eax,4
+mov ebx,1
+mov ecx,t
+mov edx,1
+int 80h
+
+pop ebx
+
+add byte[i],1
+mov al,byte[n]
+cmp al,byte[i]
+jg printi
+
+
+
+mov eax,1
+mov ebx,0
+int 80h
+

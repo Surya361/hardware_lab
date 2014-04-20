@@ -1,0 +1,13 @@
+ assemble:	nasm -f elf -l hello.lst  hello.asm
+; link:		gcc -o hello  hello.o
+; run:	        hello 
+
+nasm -f elf test.asm
+gcc test.o -o test
+. / test 
+
+nasm -f elf op.o -o q1.asm
+gcc -m32 op.o -o 1
+./1
+
+sudo apt-get install libc6-dev-i386

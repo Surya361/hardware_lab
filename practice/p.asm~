@@ -1,0 +1,37 @@
+section .data
+mesg: db "enter the array",10
+section .bss
+readnum: resb 1
+temp: resb 1
+
+section .text
+global _start:
+_start:
+	mov eax,4
+	mov ebx,1
+	mov ecx,mesg
+	mov edx,16
+	int 80h
+
+	call read
+
+	mov eax,1
+	mov ebx,0
+	int 80h
+
+read:
+	mov eax,3
+	mov ebx,0
+	mov ecx,temp
+	mov edx,1
+	int 80h
+	cmp byte[temp],10
+	je returnread
+	sub byte[temp],30h
+	mov al,byte[readnum]
+	mov bl,10
+	mul bl
+	mov byte[readnum],al
+	jmp read
+returnread:
+	ret

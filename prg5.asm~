@@ -1,0 +1,82 @@
+section .data
+
+section .bss
+num: resb 4
+num2: resb 4
+num3: resb 4
+num4: resb 4
+
+section .text
+global _start:
+_start:
+
+mov eax, 03
+mov ebx, 00
+mov ecx, num
+mov edx, 1
+int 80h
+
+sub byte[num], 30h
+mov al,byte[num]
+mov bl, 10
+mul bl
+mov byte[num],al
+
+mov eax, 03
+mov ebx, 00
+mov ecx, num2
+mov edx, 2
+int 80h
+
+sub byte[num2], 30h
+mov bl,byte[num2]
+add byte[num], bl
+
+mov eax, 03
+mov ebx, 00
+mov ecx, num3
+mov edx, 1
+int 80h
+
+sub byte[num3], 30h
+mov al,byte[num3]
+mov bl, 10
+mul bl
+mov byte[num3],al
+
+mov eax, 03
+mov ebx, 00
+mov ecx, num4
+mov edx, 2
+int 80h
+
+sub byte[num4], 30h
+mov bl, byte[num4]
+add byte[num3], bl
+
+mov bl, byte[num3]
+add byte[num], bl
+movzx ax,[num]
+mov bl,10
+div bl
+mov byte[num],al
+mov byte[num2],ah
+add byte[num],30h
+add byte[num2],30h
+
+
+mov eax, 04
+mov ebx, 01
+mov ecx, num
+mov edx, 1
+int 80h
+
+mov eax, 04
+mov ebx, 01
+mov ecx, num2
+mov edx, 1
+int 80h
+
+mov eax,01
+mov ebx,00
+int 80h

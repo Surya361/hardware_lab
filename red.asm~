@@ -1,0 +1,42 @@
+section .data
+message: db "enter the length of the array",10
+section .bss
+num1: resw 1
+temp: resb 1
+section .text
+global _start:
+_start:
+	mov eax,4
+	mov ebx,1
+	mov ecx,message
+	mov edx,30
+	int 80h
+	
+read:
+	mov word[num1],0
+	l1:
+		mov eax,3
+		mov ebx,0
+		mov ecx,temp
+		mov edx,1
+		int 80h
+		cmp byte[temp],10
+		je exit
+		sub byte[temp],30h
+		mov bl,10
+		mov ax,word[num1]
+		mul bl
+		mov word[num1],ax
+		movzx ax,byte[temp]
+		add word[num1],ax
+		jmp l1
+	exit:
+		add word[num1],30h
+		mov eax,4
+		mov ebx,1
+		mov ecx,num1
+		mov edx,1
+		int 80h
+		mov eax,1
+		mov ebx,0
+		int 80h
